@@ -15,7 +15,7 @@ server.get("/", (req, res) => {
 });
 
 server.get("/users", (req, res) => {
-  db.find(id)
+  db.find()
     .then(users => {
       res.status(200).json(users);
     })
@@ -28,7 +28,7 @@ server.get("/users", (req, res) => {
 
 // server.get('/users/:id', (req, res) => {
 //   const { id } = req.params;
-//   db.find()
+//   db.find(id)
 //     .then()
 // })
 
@@ -41,7 +41,7 @@ server.post("/users", (req, res) => {
       errorMessage: "Please provide name and bio for the user."
     });
   }
-  db.add(body)
+  db.insert(body)
     .then(user => {
       res.status(201).json(user);
     })
