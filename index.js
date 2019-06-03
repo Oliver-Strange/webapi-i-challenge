@@ -29,13 +29,17 @@ server.get("/users", (req, res) => {
 // GET USER BY ID
 server.get("/users/:id", (req, res) => {
   const { id } = req.params;
-  if (!id) {
-    res.status.apply(404).json({
-      message: "The user with the specified ID does not exist."
-    });
-  }
+
   db.findById(id)
     .then(user => {
+      if (user) {
+        res.status(201).json(user);
+      } else {
+        res.status(404).json({
+          success: false,
+          message: "The user with the specified ID does not exist."
+        });
+      }
       res.status(201).json(user);
     })
     .catch(error => {
@@ -64,6 +68,15 @@ server.post("/users", (req, res) => {
 });
 
 // PUT
+server.put("/users/:id", (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+  db.update(id, changes).then(updated => {
+    if (updated) {
+      res.status();
+    }
+  });
+});
 
 // DELETE
 
