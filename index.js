@@ -9,7 +9,7 @@ server.use(express.json());
 
 const port = 3000;
 
-// GET
+// GET USERS LIST
 server.get("/", (req, res) => {
   res.send("Hello World");
 });
@@ -26,11 +26,22 @@ server.get("/users", (req, res) => {
     });
 });
 
-// server.get('/users/:id', (req, res) => {
-//   const { id } = req.params;
-//   db.find(id)
-//     .then()
-// })
+// GET USER BY ID
+server.get("/users/:id", (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    res.status.apply(404).json({
+      message: "The user with the specified ID does not exist."
+    });
+  }
+  db.findById(id)
+    .then(user => {
+      res.status(201).json(user);
+    })
+    .catch(error => {
+      res.status(404);
+    });
+});
 
 // POST
 server.post("/users", (req, res) => {
