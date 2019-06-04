@@ -43,26 +43,27 @@ server.get("/users/:id", (req, res) => {
       res.status(201).json(user);
     })
     .catch(error => {
-      res.status(404);
+      res.status(500);
     });
 });
 
 // POST
 server.post("/users", (req, res) => {
-  const body = req.body;
+  // const body = req.body; don't need this
   const { name, bio } = req.body;
   if (!name || !bio) {
-    res.status.apply(400).json({
+    res.status(422).json({
       errorMessage: "Please provide name and bio for the user."
     });
   }
-  db.insert(body)
+  db.insert({ name, bio })
     .then(user => {
       res.status(201).json(user);
     })
     .catch(error => {
       res.status(500).json({
-        error: "There was an error while saving the user to the database"
+        error: "There was an error while saving the user to the database",
+        error
       });
     });
 });
@@ -71,14 +72,39 @@ server.post("/users", (req, res) => {
 server.put("/users/:id", (req, res) => {
   const { id } = req.params;
   const changes = req.body;
-  db.update(id, changes).then(updated => {
-    if (updated) {
-      res.status();
+  db.update(id, changes).then(updatedUser => {
+    if (updatedUser) {
+      res.status(200).json({ success: true, updatedUser });
+    } else {
+      res.status(404).json({});
     }
   });
 });
 
 // DELETE
+server.delete("/users/:id", (req, res) => {
+  const { id } = req.params;
+  db.remove(id)
+    .then(deleted => {
+      if (deleted) {
+        res.status(204).json({
+          success: true
+        });
+      } else {
+        res.status(404).json({
+          message: "The user with the specified ID does not exist."
+        });
+      }
+    })
+    .catch(err => {
+      res
+        .statusMessage(500)
+        .json({
+          success: false
+        })
+        .json({ error: "The user could not be removed" });
+    });
+});
 
 server.listen(port, () => {
   console.log(`Server is Running on http://localhost:${port}`);
